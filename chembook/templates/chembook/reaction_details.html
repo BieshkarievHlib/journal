@@ -1,0 +1,22 @@
+<title>{{ reaction.name }}</title>
+
+{% if reaction.substances.all %}
+    <p>Речовини: 
+        {% for substance in reaction.substances.all %}
+            {{ substance.name }}{%if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </p>
+{% else %}
+    <p>Речовин немає</p>
+{% endif %}
+
+<p>Опис реакції:
+    {% if reaction.description %}
+    {{ reaction.description }}
+    {% else %}
+    Опису немає
+    {% endif %}
+</p>
+<a href="{% url 'chembook:reaction_edit' reaction.id %}">Редагувати реакцію</a>
+<a href="{% url 'chembook:reaction_delete' reaction.id %}">Видалити реакцію</a>
+<a href="{% url 'chembook:reaction_list' %}">Назад до списку реакцій</a>

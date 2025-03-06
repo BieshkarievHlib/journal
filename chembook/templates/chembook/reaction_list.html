@@ -1,0 +1,12 @@
+<title>Список реакцій</title>
+
+<h1>Список реакцій:</h1>
+<ul>
+    {% for reaction in reactions %}
+        <li><a href="{% url 'chembook:reaction_details' reaction.id %}">{{ reaction.name }}</a></li>
+    {% empty %}
+        <li>Реакцій немає</li>
+    {% endfor %}
+</ul>
+
+ <a href="{% url 'chembook:reaction_create' %}">Додати нову реакцію</a>

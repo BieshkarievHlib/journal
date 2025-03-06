@@ -1,0 +1,9 @@
+<title>Видалити реакцію</title>
+
+
+<h1>Видалити з журналу {{ reaction.name }}?</h1>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Так</button>
+</form>
+<a href="{% url 'chembook:reaction_details' reaction.id %}">Назад</a>
