@@ -12,7 +12,7 @@ class Substance(models.Model):
 
 class Reaction(models.Model):
     name = models.CharField(max_length=255)
-    substances = models.ManyToManyField(Substance, blank=True, null=True)
+    substances = models.ManyToManyField(Substance, blank=True)
     description = models.CharField(max_length=255,blank=True, null=True)
 
     def __str__(self):
