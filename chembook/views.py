@@ -24,7 +24,7 @@ def reaction_edit(request, pk=None):
             return redirect('chembook:reaction_details', pk=reaction.pk)
     else:
         form = ReactionForm(instance=reaction)
-    
+
     return render(request, 'chembook/reaction_form.html', {'form':form})
 
 def reaction_delete(request, pk):

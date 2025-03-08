@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'authorisation.apps.AuthorisationConfig',
     'chembook.apps.ChembookConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -99,6 +100,8 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+AUTH_USER_MODEL = 'authorisation.StandardUser'
 
 
 # Internationalization

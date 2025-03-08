@@ -18,7 +18,6 @@ class ReactionForm(ModelForm):
 
         if substances_text:
             names = [name.strip() for name in substances_text.split(',')]
-            print(f'Names here: {names}')
             substances = [Substance.objects.get_or_create(name=name)[0] for name in names]
             
             reaction.save()                     
