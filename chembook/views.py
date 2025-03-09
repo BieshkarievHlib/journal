@@ -1,36 +1,58 @@
+from django.views.generic import ListView, DetailView, DeleteView, CreateView, UpdateView
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse_lazy, reverse
+from django.contrib.auth.decorators import permission_required, login_required
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
+
 from .models import Reaction, Substance
 from .forms import ReactionForm
-from django.http import Http404
 
-def reaction_list(request):
-    reactions = Reaction.objects.all()
-    return render(request, 'chembook/reaction_list.html', context={'reactions':reactions})
 
-def reaction_details(request, pk):
-    reaction = get_object_or_404(Reaction, pk=pk)
-    return render(request, 'chembook/reaction_details.html', context={'reaction':reaction})
+class ReactionListView(LoginRequiredMixin, ListView):
+    model = Reaction
+    template_name = 'chembook/reaction_list.html'
+    context_object_name = 'reactions'
 
-def reaction_edit(request, pk=None):
-    if pk:
-        reaction = get_object_or_404(Reaction, pk=pk)
-    else:
-        reaction = None
+class ReactionDetailsView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+    model = Reaction
+    template_name = 'chembook/reaction_details.html'
+    context_object_name = 'reaction'
+    permission_required = 'chembook.view_reaction'
 
-    if request.method == 'POST':
-        form = ReactionForm(request.POST, instance=reaction)
-        if form.is_valid():
-            reaction = form.save()
-            return redirect('chembook:reaction_details', pk=reaction.pk)
-    else:
-        form = ReactionForm(instance=reaction)
+class ReactionCreateView(LoginRequiredMixin, CreateView):
+    model = Reaction
+    form_class = ReactionForm
+    template_name = 'chembook/reaction_form.html'
+    context_object_name = 'form'
+    #permission_required = 'chembook.add_reaction'        #TODO: після впровадження управління дозволами розкоментувати
 
-    return render(request, 'chembook/reaction_form.html', {'form':form})
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
-def reaction_delete(request, pk):
-    reaction = get_object_or_404(Reaction, pk=pk)
-    if request.method == 'POST':
-        reaction.delete()  
-        return redirect('chembook:reaction_list')
-    else:
-        return render(request, 'chembook/reaction_delete.html', {'reaction':reaction})
+    def get_success_url(self):
+        return reverse_lazy('chembook:reaction_details', kwargs={'pk':self.object.pk})
+
+class ReactionUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    model = Reaction
+    form_class = ReactionForm
+    template_name = 'chembook/reaction_form.html'
+    context_object_name = 'form'
+    permission_required = 'chembook.change_reaction'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        kwargs['instance'] = self.object
+        return kwargs
+
+    def get_success_url(self):
+        return reverse_lazy('chembook:reaction_details', kwargs={'pk':self.object.pk})
+
+class ReactionDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    model = Reaction
+    template_name = 'chembook/reaction_delete.html'
+    context_object_name = 'reaction'
+    permission_required = 'chembook.delete_reaction'
+    success_url = reverse_lazy('chembook:reaction_list')
