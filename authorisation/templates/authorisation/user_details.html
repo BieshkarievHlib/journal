@@ -1,0 +1,8 @@
+<title>Мій акаунт</title>
+
+<h1>Особистий кабінет</h1>
+<h3>Ім'я: {{ user.name }}</h3>
+<h3>Прізвище: {{user.surname}} </h3>
+
+<a href="{% url 'authorisation:logout' %}">Вийти з профілю</a>
+<a href="{% url 'chembook:reaction_list' %}">До списку реакцій</a>
