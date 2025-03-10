@@ -2,6 +2,7 @@ from django.forms import ModelForm, CharField
 from .models import Reaction, Substance
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
+from guardian.shortcuts import assign_perm
 
 class ReactionForm(ModelForm):
     class Meta:
@@ -18,7 +19,6 @@ class ReactionForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.user = user
         
-
     def save(self, commit=True):
         reaction = super().save(commit=False)
 
@@ -30,14 +30,14 @@ class ReactionForm(ModelForm):
             reaction.save()               
             reaction.substances.set(substances)
         
-        if not reaction.author and self.user:
+        if not reaction.author and self.user: #Зберігаємо автора та надаємо йому дозволи при створенні нової або апдейті нічийної реакції
             reaction.save()
-            reaction.author = self.user                                 #Зберігаємо автора
-                                                                        #Видаємо автору базові дозволи, тільки якщо авторa немає      
-            content_type = ContentType.objects.get_for_model(Reaction)
-            permissions = Permission.objects.filter(content_type=content_type,codename__in=['change_reaction', 'delete_reaction', 'view_reaction',
-                                                                                            'add_reaction'])
-            reaction.author.user_permissions.add(*permissions)
+            reaction.author = self.user
+
+            assign_perm('view_reaction', reaction.author, reaction)      
+            assign_perm('delete_reaction', reaction.author, reaction)   
+            assign_perm('change_reaction', reaction.author, reaction)   
+            
 
         if commit:
             reaction.save()

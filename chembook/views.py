@@ -1,8 +1,6 @@
 from django.views.generic import ListView, DetailView, DeleteView, CreateView, UpdateView
-from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse_lazy, reverse
-from django.contrib.auth.decorators import permission_required, login_required
-from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin, UserPassesTestMixin
 
 from .models import Reaction, Substance
 from .forms import ReactionForm
@@ -19,12 +17,15 @@ class ReactionDetailsView(LoginRequiredMixin, PermissionRequiredMixin, DetailVie
     context_object_name = 'reaction'
     permission_required = 'chembook.view_reaction'
 
+    def has_permission(self):
+        reaction = self.get_object()
+        return self.request.user.has_perm(self.permission_required, reaction)
+
 class ReactionCreateView(LoginRequiredMixin, CreateView):
     model = Reaction
     form_class = ReactionForm
     template_name = 'chembook/reaction_form.html'
     context_object_name = 'form'
-    #permission_required = 'chembook.add_reaction'        #TODO: після впровадження управління дозволами розкоментувати
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -41,6 +42,10 @@ class ReactionUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView
     context_object_name = 'form'
     permission_required = 'chembook.change_reaction'
 
+    def has_permission(self):
+        reaction = self.get_object()
+        return self.request.user.has_perm(self.permission_required, reaction)
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
@@ -56,3 +61,7 @@ class ReactionDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView
     context_object_name = 'reaction'
     permission_required = 'chembook.delete_reaction'
     success_url = reverse_lazy('chembook:reaction_list')
+
+    def has_permission(self):
+        reaction = self.get_object()
+        return self.request.user.has_perm(self.permission_required, reaction)
