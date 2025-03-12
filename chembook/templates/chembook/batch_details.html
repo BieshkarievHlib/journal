@@ -14,3 +14,6 @@
 {% else %}
     <p>Інформації про речовини не знайдено! </p>
 {% endif %}
+
+<a href="{% url 'chembook:batch_edit' batch.reaction.id batch.id %}">Редагувати бетч</a>
+<a href="{% url 'chembook:reaction_details' batch.reaction.id %}">Назад до реакції</a>

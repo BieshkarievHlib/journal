@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMix
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .models import Reaction, Substance, Batch, BatchSubstance
-from .forms import ReactionForm, BatchForm
+from .forms import ReactionForm, BatchForm, BatchSubstanceFormSet
 
 
 class ReactionListView(LoginRequiredMixin, ListView):
@@ -75,14 +75,25 @@ def batch_edit(request, reaction_pk, batch_pk = None):
 
     if request.method == 'POST':
         form = BatchForm(request.POST, user=request.user, reaction=reaction_pk, instance=batch)
-        if form.is_valid():
-            form.save()
-            return redirect('chembook:reaction_list')
-        print(f'Form is invalid! Errors: {form.errors}')
+        formset = BatchSubstanceFormSet(request.POST, instance=batch)
+        if form.is_valid() and formset.is_valid():
+            batch = form.save(commit=False)
+            formset.instance = batch
+
+            reaction = Reaction.objects.get(pk=reaction_pk)
+            for substance in reaction.substances.all():
+                BatchSubstance.objects.get_or_create(batch=batch, substance=substance)
+            
+            batch.save()
+            formset.save()
+
+            return redirect('chembook:batch_details',reaction_pk=reaction_pk, batch_pk=batch.pk)
+        print(f'Form (or formset) is invalid! Errors: {form.errors}')
     else:
         form = BatchForm(user=request.user, reaction=reaction_pk, instance=batch)
+        formset = BatchSubstanceFormSet(instance=batch)
 
-    return render(request, 'chembook/batch_form.html', {'form':form})
+    return render(request, 'chembook/batch_form.html', {'form':form, 'formset':formset})
 
 class BatchDetailsView(DetailView):
     model = Batch

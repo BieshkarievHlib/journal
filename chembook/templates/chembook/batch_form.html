@@ -4,5 +4,10 @@
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
+    <h3>Речовини:</h3>
+    {{ formset.management_form }}
+    {% for subform in formset %}
+        {{ subform.as_p }}
+    {% endfor %}
     <button type="submit">Зберегти</button>
 </form>

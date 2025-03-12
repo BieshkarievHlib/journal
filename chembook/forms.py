@@ -1,4 +1,4 @@
-from django.forms import ModelForm, CharField
+from django.forms import ModelForm, CharField, inlineformset_factory
 from .models import Reaction, Substance, Batch, BatchSubstance
 
 from guardian.shortcuts import assign_perm
@@ -49,7 +49,7 @@ class BatchForm(ModelForm):                                             #TODO: �
         model = Batch
         fields = [
             'description',
-            'sample_number',                                            #TODO: Розглянути можливість заміни на рк або більш інформативне поле
+            'sample_number',                                            #TODO: Розглянути можливість заміни на id або більш інформативне поле
             'is_probe'
         ]
     
@@ -62,8 +62,9 @@ class BatchForm(ModelForm):                                             #TODO: �
         batch = super().save(commit=False)
         batch.reaction =  self.reaction
         batch.save()
-        batch.substances.set([BatchSubstance.objects.get_or_create(batch=self.instance, substance=substance)[0]
-                          for substance in self.reaction.substances.all()])
+
+        #batch.substances.set([BatchSubstance.objects.get_or_create(batch=self.instance, substance=substance)[0]
+        #                  for substance in self.reaction.substances.all()])
         
         if not batch.author and self.user: #Зберігаємо автора та надаємо йому дозволи при створенні нової або апдейті нічийного бетчу
             batch.author = self.user
@@ -76,3 +77,6 @@ class BatchForm(ModelForm):                                             #TODO: �
             batch.save()
 
         return batch
+
+BatchSubstanceFormSet = inlineformset_factory(parent_model=Batch,model=BatchSubstance,
+                                              fields=('substance', 'mass'),extra=1,can_delete=True)
