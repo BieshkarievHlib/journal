@@ -1,7 +1,6 @@
 from django.forms import ModelForm, CharField
-from .models import Reaction, Substance
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
+from .models import Reaction, Substance, Batch, BatchSubstance
+
 from guardian.shortcuts import assign_perm
 
 class ReactionForm(ModelForm):
@@ -43,3 +42,37 @@ class ReactionForm(ModelForm):
             reaction.save()
         
         return reaction
+    
+class BatchForm(ModelForm):                                             #TODO: розглянути наслідування від ReactionForm
+                                                                        #TODO: прикрутити повноцінний функціонал для апдейту
+    class Meta:
+        model = Batch
+        fields = [
+            'description',
+            'sample_number',                                            #TODO: Розглянути можливість заміни на рк або більш інформативне поле
+            'is_probe'
+        ]
+    
+    def __init__(self, *args, user = None, reaction = None, **kwargs):
+        self.user = user
+        self.reaction = Reaction.objects.get(pk=reaction)
+        super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        batch = super().save(commit=False)
+        batch.reaction =  self.reaction
+        batch.save()
+        batch.substances.set([BatchSubstance.objects.get_or_create(batch=self.instance, substance=substance)[0]
+                          for substance in self.reaction.substances.all()])
+        
+        if not batch.author and self.user: #Зберігаємо автора та надаємо йому дозволи при створенні нової або апдейті нічийного бетчу
+            batch.author = self.user
+
+            assign_perm('view_batch', batch.author, batch)      
+            assign_perm('delete_batch', batch.author, batch)   
+            assign_perm('change_batch', batch.author, batch)   
+
+        if commit:
+            batch.save()
+
+        return batch

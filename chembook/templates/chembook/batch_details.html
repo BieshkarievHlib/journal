@@ -1,0 +1,16 @@
+<title>{{ batch.reaction.name }}</title>
+
+<p>Опис синтезу:
+    {{ batch.description }}
+</p>
+
+{% if batch.substances.all %}
+    <p>Інформація про речовини:
+        {% for batch_substance in batch.substances.all %}
+            {{ batch_substance.substance.name }}: {{ batch_substance.mass }} грамів {% if not forloop.last%}      
+            {% endif %}
+        {% endfor %}
+    </p>
+{% else %}
+    <p>Інформації про речовини не знайдено! </p>
+{% endif %}

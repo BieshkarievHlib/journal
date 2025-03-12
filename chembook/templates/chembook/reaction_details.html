@@ -17,6 +17,17 @@
     Опису немає
     {% endif %}
 </p>
+
+{% if reaction.batches.all %}
+<p>Бетчі:
+    {% for batch in reaction.batches.all %}
+        <a href="{% url 'chembook:batch_details' reaction.id batch.id %}">Batch {{ batch.id }}</a>
+    {% endfor %}
+</p>
+{% endif %}
+
+<a href="{% url 'chembook:batch_create' reaction.id %}">Додати новиий синтез</a>
+
 <a href="{% url 'chembook:reaction_edit' reaction.id %}">Редагувати реакцію</a>
 <a href="{% url 'chembook:reaction_delete' reaction.id %}">Видалити реакцію</a>
 <a href="{% url 'chembook:reaction_list' %}">Назад до списку реакцій</a>
