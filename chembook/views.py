@@ -67,11 +67,13 @@ class ReactionDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView
         reaction = self.get_object()
         return self.request.user.has_perm(self.permission_required, reaction)
 
-def batch_edit(request, reaction_pk, batch_pk = None):
+def batch_edit(request, reaction_pk, batch_pk = None):                                  #TODO: Додати до всіх бетчviews підтримку дозволів
     if batch_pk:
         batch = get_object_or_404(Batch, pk=batch_pk)
     else:
         batch = None
+
+
 
     if request.method == 'POST':
         form = BatchForm(request.POST, user=request.user, reaction=reaction_pk, instance=batch)
@@ -86,14 +88,13 @@ def batch_edit(request, reaction_pk, batch_pk = None):
             
             batch.save()
             formset.save()
-
             return redirect('chembook:batch_details',reaction_pk=reaction_pk, batch_pk=batch.pk)
         print(f'Form (or formset) is invalid! Errors: {form.errors}')
     else:
         form = BatchForm(user=request.user, reaction=reaction_pk, instance=batch)
         formset = BatchSubstanceFormSet(instance=batch)
 
-    return render(request, 'chembook/batch_form.html', {'form':form, 'formset':formset})
+        return render(request, 'chembook/batch_form.html', {'form':form, 'formset':formset})
 
 class BatchDetailsView(DetailView):
     model = Batch

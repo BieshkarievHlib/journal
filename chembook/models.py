@@ -34,7 +34,7 @@ class Batch(models.Model):                      #TODO: розглянути мо
     """
     reaction = models.ForeignKey(Reaction, on_delete=models.CASCADE, related_name='batches')
     description = models.CharField(max_length=255,blank=True, null=True)
-    sample_number  = models.IntegerField(default=0)      #TODO: прописати дефолт через інкремент += 1 при створенні, декремент -= 1 при видаленні
+    sample_number  = models.IntegerField(default=0)      #TODO: прописати дефолт через інкремент += 1 при створенні, декремент -= 1 при видаленні. Або замінити на шось реально корисне
     is_probe = models.BooleanField(default=False)
     author = models.ForeignKey(StandardUser, on_delete=models.SET_NULL, blank=True, null=True)
 
