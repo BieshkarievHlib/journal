@@ -33,6 +33,7 @@ class ReactionForm(ModelForm):
             reaction.save()
             reaction.author = self.user
 
+            assign_perm('add_batch', reaction.author, reaction)
             assign_perm('view_reaction', reaction.author, reaction)      
             assign_perm('delete_reaction', reaction.author, reaction)   
             assign_perm('change_reaction', reaction.author, reaction)   
@@ -67,11 +68,12 @@ class BatchForm(ModelForm):                                             #TODO: �
         #                  for substance in self.reaction.substances.all()])
         
         if not batch.author and self.user: #Зберігаємо автора та надаємо йому дозволи при створенні нової або апдейті нічийного бетчу
+            batch.save()
             batch.author = self.user
 
             assign_perm('view_batch', batch.author, batch)      
             assign_perm('delete_batch', batch.author, batch)   
-            assign_perm('change_batch', batch.author, batch)   
+            assign_perm('change_batch', batch.author, batch)
 
         if commit:
             batch.save()

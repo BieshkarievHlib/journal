@@ -21,7 +21,7 @@ class Reaction(models.Model):
     class Meta:
         default_permissions = ('add','delete','change','view')
         permissions = [
-
+            ('add_batch', 'Може створювати бетчі для цієї реакції')
         ]
 
     def __str__(self):
@@ -37,6 +37,12 @@ class Batch(models.Model):                      #TODO: розглянути мо
     sample_number  = models.IntegerField(default=0)      #TODO: прописати дефолт через інкремент += 1 при створенні, декремент -= 1 при видаленні. Або замінити на шось реально корисне
     is_probe = models.BooleanField(default=False)
     author = models.ForeignKey(StandardUser, on_delete=models.SET_NULL, blank=True, null=True)
+
+    class Meta:
+        default_permissions = ('add','delete','change','view')
+        permissions = [
+
+        ]
 
 class BatchSubstance(models.Model):
     batch = models.ForeignKey(Batch, on_delete=models.CASCADE, related_name='substances')

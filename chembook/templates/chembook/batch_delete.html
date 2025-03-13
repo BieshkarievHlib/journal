@@ -1,0 +1,9 @@
+<title>Видалити Batch</title>
+
+
+<h1>Видалити з журналу Batch {{ batch.id }}?</h1>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Так</button>
+</form>
+<a href="{% url 'chembook:batch_details' batch.reaction.id batch.id %}">Назад</a>

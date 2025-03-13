@@ -16,4 +16,5 @@
 {% endif %}
 
 <a href="{% url 'chembook:batch_edit' batch.reaction.id batch.id %}">Редагувати бетч</a>
+<a href="{% url 'chembook:batch_delete' batch.reaction.id batch.id %}">Видалити бетч</a>
 <a href="{% url 'chembook:reaction_details' batch.reaction.id %}">Назад до реакції</a>
