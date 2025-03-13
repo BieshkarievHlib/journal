@@ -12,20 +12,52 @@ class Substance(models.Model):
     def __str__(self):
         return self.name
 
+class Synthesis(models.Model):
+    name = models.CharField(max_length=255, blank=True, null=True)
+    description = models.CharField(max_length=255, blank=True, null=True)
+    main_product = models.ForeignKey(Substance, on_delete=models.SET_NULL, blank=True, null=True, related_name='producing_syntheses')
+    author = models.ForeignKey(StandardUser, on_delete=models.SET_NULL, blank=True, null=True, related_name='syntheses')
+    number_of_stages = models.IntegerField(default=0)
+#TODO:manager = models.ForeignKey(Manager, on_delete=models.SET_NULL, blank=True, null=True, related_name='syntheses')
+
+    class Meta:
+        default_permissions = ('delete','change','view')
+        permissions = [
+            ('add_reaction', 'Може створювати реакції в цьому синтезі'),
+            ('add_pathway','Може додавати шляхи синтезу'),
+            ('add_stage','Може додавати стадії синтезу')
+        ]
+
+    def __str__(self):
+        return self.name
+
 class Reaction(models.Model):
     name = models.CharField(max_length=255)
     substances = models.ManyToManyField(Substance, blank=True)
     description = models.CharField(max_length=255,blank=True, null=True)
-    author = models.ForeignKey(StandardUser, on_delete=models.SET_NULL, blank=True, null=True)
+    author = models.ForeignKey(StandardUser, on_delete=models.SET_NULL, blank=True, null=True, related_name='owned_reactions')
+    main_product = models.ForeignKey(Substance, on_delete=models.SET_NULL, blank=True, null=True, related_name='producing_reactions')
 
     class Meta:
-        default_permissions = ('add','delete','change','view')
+        default_permissions = ('delete','change','view')
         permissions = [
             ('add_batch', 'Може створювати бетчі для цієї реакції')
         ]
 
     def __str__(self):
         return self.name
+
+class Pathway(models.Model):
+    synthesis = models.ForeignKey(Synthesis, on_delete=models.CASCADE, related_name='pathways')
+
+class Stage(models.Model):
+    pathway = models.ForeignKey(Pathway, on_delete=models.CASCADE, related_name='stages')
+    reaction = models.ForeignKey(Reaction, on_delete=models.SET_NULL, blank=True, null=True, related_name='usages_in_stages')
+    
+    number = models.IntegerField(default=0)
+    description = models.CharField(max_length=255, blank=True, null=True)
+    previous_reaction = models.ForeignKey(Reaction, on_delete=models.SET_NULL, blank=True, null=True, related_name='products')
+    next_reaction = models.ForeignKey(Reaction, on_delete=models.SET_NULL, blank=True, null=True, related_name='reactions_used_to_obtain')
 
 class Batch(models.Model):                      #TODO: розглянути можливість наслідування від Reaction, якщо переписати Reaction або написати спільний батьківський клас
     """

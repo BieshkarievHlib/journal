@@ -1,0 +1,30 @@
+<title>{{ synthesis.name }}</title>
+
+{% if synthesis.pathways.all %}
+    <p>Шляхи синтезу: 
+        {% for pathway in synthesis.pathways.all %}
+            <a href="{% url 'chembook:pathway_edit' synthesis.id pathway.id%}">{{ pathway.id }}:</a> 
+                {% for stage in pathway.stages.all %}
+                    <a href="{% url 'chembook:reaction_details' stage.reaction.id %}"> {{ stages.reaction.name }}</a>{% if not forloop.last %}
+
+                    {% endif %}
+                {% endfor %}
+                {% if not forloop.last %}
+                
+                
+                {% endif %}
+        {% endfor %}
+    </p>
+<a href="{% url 'chembook:pathway_create' synthesis.id %}">Створити новий шлях синтезу</a>
+{% else %}
+    <p>Шляхів синтезу немає</p>
+    <a href="{% url 'chembook:pathway_create' synthesis.id %}">Створити новий шлях синтезу</a>
+{% endif %}
+
+<p>Опис синтезу:
+    {% if synthesis.description %}
+        {{ synthesis.description }}
+    {% else %}
+        Опису немає
+    {% endif %}
+</p>

@@ -6,8 +6,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.http import HttpResponseForbidden
 
 
-from .models import Reaction, Substance, Batch, BatchSubstance
-from .forms import ReactionForm, BatchForm, BatchSubstanceFormSet
+from .models import Reaction, Substance, Batch, BatchSubstance, Synthesis, Pathway
+from .forms import ReactionForm, BatchForm, BatchSubstanceFormSet, SynthesisForm, StageFormSet, PathwayForm
 
 
 class ReactionListView(LoginRequiredMixin, ListView):
@@ -15,7 +15,7 @@ class ReactionListView(LoginRequiredMixin, ListView):
     template_name = 'chembook/reaction_list.html'
     context_object_name = 'reactions'
 
-@permission_required('chembook.change_reaction', raise_exception=True)
+@permission_required('chembook.change_reaction', raise_exception=True) #TODO: Змінити дозволи на такі самі, як у batches після того, як реалізую Synthesis.
 def reaction_edit(request, reaction_pk=None):
     if reaction_pk:
         reaction = get_object_or_404(Reaction, pk=reaction_pk)
@@ -59,7 +59,7 @@ class ReactionDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView
         reaction = self.get_object()
         return self.request.user.has_perm(self.permission_required, reaction)
 
-def batch_edit(request, reaction_pk, batch_pk = None):                                  #TODO: Додати до всіх бетчviews підтримку дозволів
+def batch_edit(request, reaction_pk, batch_pk = None):
     if batch_pk and request.user.has_perm('chembook.change_batch', Batch.objects.get(pk=batch_pk)):
         batch = get_object_or_404(Batch, pk=batch_pk)
     elif not batch_pk and request.user.has_perm('chembook.add_batch', Reaction.objects.get(pk=reaction_pk)):
@@ -115,9 +115,66 @@ class BatchDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     def get_success_url(self):
         return reverse_lazy('chembook:reaction_details', kwargs={'reaction_pk':self.kwargs['reaction_pk']})
 
+class SynthesisListView(LoginRequiredMixin, ListView):
+    model = Synthesis
+    template_name = 'chembook/synthesis_list.html'
+    context_object_name = 'syntheses'
+
+class SynthesisDetailsView(DetailView):
+    model = Synthesis
+    template_name = 'chembook/synthesis_details.html'
+    context_object_name = 'synthesis'
+
+    def get_object(self):
+        return get_object_or_404(Synthesis, pk=self.kwargs['synthesis_pk'])
     
+def synthesis_edit(request, synthesis_pk=None):
+    if synthesis_pk:
+        synthesis = get_object_or_404(Synthesis, pk=synthesis_pk)
+    else:
+        synthesis = None
 
+    if request.method == 'POST':
+        form = SynthesisForm(request.POST, user=request.user, instance=synthesis)
+        if form.is_valid():
+            synthesis = form.save()
+            return redirect('chembook:synthesis_details', synthesis_pk=synthesis.pk)
+    else:
+        form = SynthesisForm(user=request.user, instance=synthesis)
+        
+    return render(request, 'chembook/synthesis_form.html', {'form':form})
 
+class SynthesisDeleteView(DeleteView):
+    model = Synthesis
+    template_name = 'chembook/synthesis_delete.html'
+    context_object_name = 'synthesis'
+    #permission_required = 'chembook.delete_synthesis'
+    success_url = reverse_lazy('chembook:synthesis_list')
+
+    def get_object(self):
+        return get_object_or_404(Synthesis, pk=self.kwargs['synthesis_pk'])
+
+def pathway_edit(request, synthesis_pk, pathway_pk = None):
+    if pathway_pk:
+        pathway = get_object_or_404(Pathway, pk=pathway_pk)
+    elif not pathway_pk:
+        pathway = None
+
+    if request.method == 'POST':
+        form = PathwayForm(request.POST,synthesis=synthesis_pk, instance=pathway)
+        formset = StageFormSet(request.POST, instance=pathway)
+        if form.is_valid() and formset.is_valid():
+            pathway = form.save(commit=False)
+            formset.instance = pathway
+            pathway.save()
+            formset.save()
+            return redirect('chembook:synthesis_details', synthesis_pk=synthesis_pk)
+        print(f'Form (or formset) is invalid! Errors: {form.errors}, {formset.errors}')
+    else:
+        form = PathwayForm(synthesis=synthesis_pk, instance=pathway)
+        formset = StageFormSet(instance=pathway)
+
+    return render(request, 'chembook/pathway_form.html', {'form':form, 'formset':formset})
 
 
 
