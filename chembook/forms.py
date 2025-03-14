@@ -136,4 +136,4 @@ BatchSubstanceFormSet = inlineformset_factory(parent_model=Batch,model=BatchSubs
                                               fields=('substance', 'mass'),extra=1,can_delete=True)
 
 StageFormSet = inlineformset_factory(parent_model=Pathway, model=Stage,
-                                    fields=('reaction', 'number', 'description'),extra=1,can_delete=True)
+                                    fields=('reaction', 'order_number', 'description'),extra=1,can_delete=True)

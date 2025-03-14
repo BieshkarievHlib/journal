@@ -15,7 +15,7 @@ class ReactionListView(LoginRequiredMixin, ListView):
     template_name = 'chembook/reaction_list.html'
     context_object_name = 'reactions'
 
-@permission_required('chembook.change_reaction', raise_exception=True) #TODO: Змінити дозволи на такі самі, як у batches після того, як реалізую Synthesis.
+#TODO: Додати перевірку user.has_perm() в if-else statement: прив'язка до синтезу буде необов'язкова
 def reaction_edit(request, reaction_pk=None):
     if reaction_pk:
         reaction = get_object_or_404(Reaction, pk=reaction_pk)
@@ -176,7 +176,13 @@ def pathway_edit(request, synthesis_pk, pathway_pk = None):
 
     return render(request, 'chembook/pathway_form.html', {'form':form, 'formset':formset})
 
+class PathwayDetailsView(DetailView):
+    model = Pathway
+    template_name = 'chembook/pathway_details.html'
+    context_object_name = 'pathway'
 
+    def get_object(self):
+        return get_object_or_404(Pathway, pk=self.kwargs['pathway_pk'], synthesis__pk=self.kwargs['synthesis_pk'])
 
 
 

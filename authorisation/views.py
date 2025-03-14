@@ -9,12 +9,14 @@ from .forms import StandardUserCreationForm, StandardLoginForm
 from .models import StandardUser
 
 # Create your views here.
-def register(request):
+def register(request):                              #TODO: Додати обробку помилок типу реєстрації користувача, який вже існує через form.invalid()
     if request.method == 'POST':
         form = StandardUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
             login(request, user)
+
             return redirect('chembook:reaction_list')
     else:
         form = StandardUserCreationForm()
@@ -23,6 +25,13 @@ def register(request):
 class StandardLoginView(LoginView):
     template_name = 'authorisation/login.html'
     authentication_form = StandardLoginForm
+
+    def form_valid(self, form):
+        user = form.get_user()
+        user.backend = 'django.contrib.auth.backends.ModelBackend'
+        login(self.request, user=user)
+
+        return super().form_valid(form)
     
     next_page = reverse_lazy('chembook:reaction_list')
 
