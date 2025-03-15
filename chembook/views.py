@@ -176,15 +176,16 @@ def pathway_edit(request, synthesis_pk, pathway_pk = None):
 
     return render(request, 'chembook/pathway_form.html', {'form':form, 'formset':formset})
 
-class PathwayDetailsView(DetailView):
+class PathwayDeleteView(DeleteView):
     model = Pathway
-    template_name = 'chembook/pathway_details.html'
+    template_name = 'chembook/pathway_delete.html'
     context_object_name = 'pathway'
 
     def get_object(self):
-        return get_object_or_404(Pathway, pk=self.kwargs['pathway_pk'], synthesis__pk=self.kwargs['synthesis_pk'])
+        return get_object_or_404(Pathway, pk=self.kwargs['pathway_pk'],synthesis__pk=self.kwargs['synthesis_pk'])
 
-
+    def get_success_url(self):
+        return reverse_lazy('chembook:synthesis_list')
 
 
 

@@ -1,4 +1,4 @@
-<title>Створити шлях синтезу</title>
+
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
@@ -8,3 +8,10 @@
     {% endfor %}
 <button type="submit">Зберегти</button>
 </form>
+
+{% if form.instance %}
+    <title>Створити шлях синтезу</title>
+    <a href="{% url 'chembook:pathway_delete' form.instance.synthesis.id form.instance.id %}">Видалити</a>
+{% else %}
+    <title>Редагувати шлях синтезу</title>
+{% endif %}

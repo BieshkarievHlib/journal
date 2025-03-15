@@ -1,0 +1,9 @@
+<title>Видалити шлях синтезу</title>
+
+
+<h1>Видалити з журналу шлях синтезу номер {{ pathway.id }}?</h1>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Так</button>
+</form>
+<a href="{% url 'chembook:synthesis_details' pathway.synthesis.id %}">Назад</a>
