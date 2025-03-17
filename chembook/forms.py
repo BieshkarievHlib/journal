@@ -49,9 +49,8 @@ class BatchForm(ModelForm):                                             #TODO: �
     class Meta:
         model = Batch
         fields = [
+            'name',
             'description',
-            'sample_number',                                            #TODO: Розглянути можливість заміни на id або більш інформативне поле
-            'is_probe'
         ]
     
     def __init__(self, *args, user = None, reaction = None, **kwargs):
@@ -136,4 +135,4 @@ BatchSubstanceFormSet = inlineformset_factory(parent_model=Batch,model=BatchSubs
                                               fields=('substance', 'mass'),extra=1,can_delete=True)
 
 StageFormSet = inlineformset_factory(parent_model=Pathway, model=Stage,
-                                    fields=('reaction', 'order_number', 'description'),extra=1,can_delete=True)
+                                    fields=('reaction', 'description'),extra=1,can_delete=True)

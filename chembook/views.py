@@ -30,7 +30,7 @@ def reaction_edit(request, reaction_pk=None):
     else:
         form = ReactionForm(user=request.user, instance=reaction)
 
-    return render(request, 'chembook/reaction_form.html', {'form':form})
+    return render(request, 'chembook/reaction_form.html', {'form':form, 'reaction':reaction})
 
 class ReactionDetailsView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     model = Reaction

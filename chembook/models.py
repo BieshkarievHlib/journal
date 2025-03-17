@@ -12,40 +12,40 @@ class Substance(models.Model):
     def __str__(self):
         return self.name
 
-class Synthesis(models.Model):
-    name = models.CharField(max_length=255, blank=True, null=True)
-    description = models.CharField(max_length=255, blank=True, null=True)
-    main_product = models.ForeignKey(Substance, on_delete=models.SET_NULL, blank=True, null=True, related_name='producing_syntheses')
-    author = models.ForeignKey(StandardUser, on_delete=models.SET_NULL, blank=True, null=True, related_name='syntheses')
+class AbstractChemicalTransformation(models.Model):
+    """Абстрактний клас, який втілює спільні риси моделей синтезу, реакції та бетчу."""
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    main_product = models.ForeignKey(Substance, on_delete=models.SET_NULL, blank=True, null=True) #TODO: add related_name='...' inheritance somehow
+    author = models.ForeignKey(StandardUser, on_delete=models.SET_NULL, blank=True, null=True)
+
+    class Meta: 
+        abstract = True
+        default_permissions = ('delete','change','view')
+
+    def __str__(self):
+        return self.name
+
+
+class Synthesis(AbstractChemicalTransformation):
     number_of_stages = models.IntegerField(default=0)
 #TODO:manager = models.ForeignKey(Manager, on_delete=models.SET_NULL, blank=True, null=True, related_name='syntheses')
 
     class Meta:
-        default_permissions = ('delete','change','view')
         permissions = [
             #('add_reaction', 'Може створювати реакції в цьому синтезі'),   TODO: Визначитися, чи будуть реакції групуватися по синтезах і тільки.
             ('add_pathway','Може додавати шляхи синтезу'),
             ('add_stage','Може додавати стадії синтезу')
         ]
 
-    def __str__(self):
-        return self.name
-
-class Reaction(models.Model):
-    name = models.CharField(max_length=255)
-    substances = models.ManyToManyField(Substance, blank=True)
-    description = models.CharField(max_length=255,blank=True, null=True)
-    author = models.ForeignKey(StandardUser, on_delete=models.SET_NULL, blank=True, null=True, related_name='owned_reactions', db_index=True)
-    main_product = models.ForeignKey(Substance, on_delete=models.SET_NULL, blank=True, null=True, related_name='producing_reactions')
+class Reaction(AbstractChemicalTransformation):
+    substances = models.ManyToManyField(Substance, blank=True,related_name='reaction_usages')
 
     class Meta:
         default_permissions = ('delete','change','view')
         permissions = [
             ('add_batch', 'Може створювати бетчі для цієї реакції')
         ]
-
-    def __str__(self):
-        return self.name
 
 class Pathway(models.Model):
     synthesis = models.ForeignKey(Synthesis, on_delete=models.CASCADE, related_name='pathways')
@@ -62,22 +62,13 @@ class Stage(models.Model):
     class Meta:
         ordering = ['pathway', 'order_number']
 
-class Batch(models.Model):                      #TODO: розглянути можливість наслідування від Reaction, якщо переписати Reaction або написати спільний батьківський клас
+class Batch(AbstractChemicalTransformation):                      #TODO: розглянути можливість наслідування від Reaction, якщо переписати Reaction або написати спільний батьківський клас
     """
     ACHTUNG! 
     Batch створювати ВИКЛЮЧНО через форму: reaction та batch.substances присвоюється тільки в BatchForm.save()
     """
     reaction = models.ForeignKey(Reaction, on_delete=models.CASCADE, related_name='batches')
-    description = models.CharField(max_length=255,blank=True, null=True)
     sample_number  = models.IntegerField(default=0)      #TODO: прописати дефолт через інкремент += 1 при створенні, декремент -= 1 при видаленні. Або замінити на шось реально корисне
-    is_probe = models.BooleanField(default=False)
-    author = models.ForeignKey(StandardUser, on_delete=models.SET_NULL, blank=True, null=True)
-
-    class Meta:
-        default_permissions = ('add','delete','change','view')
-        permissions = [
-
-        ]
 
 class BatchSubstance(models.Model):
     batch = models.ForeignKey(Batch, on_delete=models.CASCADE, related_name='substances')

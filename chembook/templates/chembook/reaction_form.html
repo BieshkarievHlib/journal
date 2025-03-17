@@ -1,6 +1,10 @@
 <title>Створити реакцію</title>
 
-<h1>Нова реакція:</h1>
+{% if reaction.name %}
+    <h1>Редагувати реакцію:</h1>
+{% else %}
+    <h1>Створити реакцію</h1>
+{% endif %}
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
