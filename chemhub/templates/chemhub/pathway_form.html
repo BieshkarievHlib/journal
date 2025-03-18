@@ -9,9 +9,9 @@
 <button type="submit">Зберегти</button>
 </form>
 
-{% if form.instance %}
+{% if form.instance.id %}
     <title>Створити шлях синтезу</title>
-    <a href="{% url 'chembook:pathway_delete' form.instance.synthesis.id form.instance.id %}">Видалити</a>
+    <a href="{% url 'chemhub:pathway_delete' form.instance.synthesis.id form.instance.id %}">Видалити</a>
 {% else %}
     <title>Редагувати шлях синтезу</title>
 {% endif %}

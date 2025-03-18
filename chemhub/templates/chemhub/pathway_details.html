@@ -3,11 +3,11 @@
 {% if pathway.stages.all %}
     {% for stage in pathway.stages.all %}
         <p>Стадія {{ stage.order_number }}:
-            <a href="{% url 'reaction_details' stage.reaction.id %}">{{ stage.reaction.name }}</a>
+            <a href="{% url 'chembook:reaction_details' stage.reaction.id %}">{{ stage.reaction.name }}</a>
         </p>
     {% endfor %}
 {% else %}
 <p>Стадій немає</p>
 {% endfor %}
 
-<a href="{% url 'synthesis_details% pathway.synthesis.id }">Назад до синтезу</a>
+<a href="{% url 'chemhub:synthesis_details' pathway.synthesis.id %}">Назад до синтезу</a>

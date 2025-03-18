@@ -3,7 +3,7 @@
 {% if synthesis.pathways.all %}
     <p>Шляхи синтезу: <br/>
         {% for pathway in synthesis.pathways.all %}
-            <a href="{% url 'chembook:pathway_edit' synthesis.id pathway.id%}">{{ pathway.id }}:</a> 
+            <a href="{% url 'chemhub:pathway_edit' synthesis.id pathway.id%}">{{ pathway.id }}:</a> 
             {% if pathway.stages.all %} <br/>
                 {% for stage in pathway.stages.all %}
                     <a href="{% url 'chembook:reaction_details' stage.reaction.id %}"> {{ stage.reaction.name }}</a>
@@ -21,7 +21,7 @@
     <p>Шляхів синтезу немає</p>
 {% endif %}
 
-<a href="{% url 'chembook:pathway_create' synthesis.id %}">Створити новий шлях синтезу</a>
+<a href="{% url 'chemhub:pathway_create' synthesis.id %}">Створити новий шлях синтезу</a>
 
 <p>Опис синтезу:
     {% if synthesis.description %}

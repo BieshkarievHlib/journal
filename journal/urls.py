@@ -22,4 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('chembook/', include('chembook.urls')),
     path('auth/', include('authorisation.urls')),
+    path('chemhub/', include('chemhub.urls')),
 ]

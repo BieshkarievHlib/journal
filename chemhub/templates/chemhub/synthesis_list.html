@@ -3,10 +3,10 @@
 <h1>Список синтезів:</h1>
 <ul>
     {% for synthesis in syntheses %}
-        <li><a href="{% url 'chembook:synthesis_details' synthesis.id %}">{{ synthesis.name }}</a></li>
+        <li><a href="{% url 'chemhub:synthesis_details' synthesis.id %}">{{ synthesis.name }}</a></li>
     {% empty %}
         <li>Синтезів немає</li>
     {% endfor %}
 </ul>
 
- <a href="{% url 'chembook:synthesis_create' %}">Додати новий синтез</a>
+ <a href="{% url 'chemhub:synthesis_create' %}">Додати новий синтез</a>

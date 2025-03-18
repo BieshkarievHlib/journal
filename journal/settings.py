@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'guardian',
     'authorisation.apps.AuthorisationConfig',
+    'chemhub.apps.ChemhubConfig',
     'chembook.apps.ChembookConfig',
     'django.contrib.admin',
     'django.contrib.auth',
