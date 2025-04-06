@@ -1,6 +1,7 @@
 from django.db import models
 
-from chembook.models import AbstractChemicalTransformation, Reaction
+from journal.abstractions import AbstractChemicalTransformation
+from chembook.models import Reaction
 from authorisation.models import StandardUser
 
 class Project(models.Model):

@@ -1,6 +1,7 @@
 from django.db import models
 from authorisation.models import StandardUser
 
+from journal.abstractions import AbstractChemicalTransformation
 # Create your models here.
 
 class Substance(models.Model):
@@ -8,20 +9,6 @@ class Substance(models.Model):
     smiles = models.CharField(max_length=255,blank=True, null=True)
     image = models.FileField(blank=True, null=True)
     molecular_mass = models.FloatField(default=0, blank=True, null=True) #TODO: прибрати бленк і нулл, прописати логіку для дефолту і вайпнути БД
-
-    def __str__(self):
-        return self.name
-
-class AbstractChemicalTransformation(models.Model):
-    """Абстрактний клас, який втілює спільні риси моделей синтезу, реакції та бетчу."""
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
-    main_product = models.ForeignKey(Substance, on_delete=models.SET_NULL, blank=True, null=True) #TODO: add related_name='...' inheritance somehow
-    author = models.ForeignKey(StandardUser, on_delete=models.SET_NULL, blank=True, null=True)
-
-    class Meta: 
-        abstract = True
-        default_permissions = ('delete','change','view')
 
     def __str__(self):
         return self.name
