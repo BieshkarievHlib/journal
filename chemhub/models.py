@@ -1,10 +1,14 @@
 from django.db import models
-from chembook.models import AbstractChemicalTransformation, Reaction
 
-# Create your models here.
+from chembook.models import AbstractChemicalTransformation, Reaction
+from authorisation.models import StandardUser
+
+class Project(models.Model):
+    name = models.CharField(max_length=255)
+    manager = models.ForeignKey(StandardUser, on_delete=models.SET_NULL, blank=True, null=True, related_name='projects')
+
 class Synthesis(AbstractChemicalTransformation):
     number_of_stages = models.IntegerField(default=0)
-#TODO:manager = models.ForeignKey(Manager, on_delete=models.SET_NULL, blank=True, null=True, related_name='syntheses')
 
     class Meta:
         permissions = [

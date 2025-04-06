@@ -18,6 +18,8 @@ def register(request):                              #TODO: Додати обро
             login(request, user)
 
             return redirect('chembook:reaction_list')
+        else:
+            return redirect('authorisation:register')
     else:
         form = StandardUserCreationForm()
         return render(request, 'authorisation/register.html', {'form':form})
